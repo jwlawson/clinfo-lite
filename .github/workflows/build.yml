@@ -1,0 +1,23 @@
+name: Build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: jwlawson/actions-setup-cmake@v1.0
+      with:
+        cmake-version: 3.8
+    - name: configure
+      run: |
+        mkdir build
+        cd build
+        cmake ..
+    - name: make
+      run: |
+        cd build
+        make
+    - name: Run
+      run: build/clinfo-lite
