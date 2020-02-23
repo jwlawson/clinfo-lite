@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2019 John Lawson
- * All rights reserved.
+ * Copyright 2019-2020 John Lawson
  *
  * clinfo-lite is a small utility tool to output OpenCL platform and device
  * information.
