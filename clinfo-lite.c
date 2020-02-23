@@ -21,10 +21,10 @@
     exit(OPENCL_ERROR);                                                  \
   }
 
-#define CL_CALL(func, ...)               \
-  do {                                   \
-    cl_uint error = (func)(__VA_ARGS__); \
-    CL_CHECK_ERR(error);                 \
+#define CL_CALL(func, ...)              \
+  do {                                  \
+    cl_int error = (func)(__VA_ARGS__); \
+    CL_CHECK_ERR(error);                \
   } while (0)
 
 static void* checked_malloc(size_t num_bytes) {
@@ -116,7 +116,6 @@ static void print_all_platform_info(cl_platform_id platform) {
 
 static void print_string_device_info(cl_device_id device,
                                      cl_device_info info_name) {
-  cl_uint error;
   size_t info_size;
   CL_CALL(clGetDeviceInfo,
           /*device=*/device,
@@ -159,12 +158,17 @@ static void print_all_device_info(cl_device_id device) {
 }
 
 int main() {
-  cl_uint error = CL_SUCCESS;
   cl_uint num_platforms;
-  CL_CALL(clGetPlatformIDs,
-          /*num_entries=*/100,
-          /*platforms=*/NULL,
-          /*num_platforms=*/&num_platforms);
+  cl_int error = clGetPlatformIDs(
+      /*num_entries=*/0,
+      /*platforms=*/NULL,
+      /*num_platforms=*/&num_platforms);
+  if (error != CL_SUCCESS || num_platforms == 0) {
+    /* The Khronos ICD loader will return -1001 if no platforms are found,
+     * rather than just setting num_platforms to 0. */
+    puts("No OpenCL platforms found");
+    return 0;
+  }
 
   cl_platform_id* platforms =
       checked_malloc(num_platforms * sizeof(cl_platform_id));
